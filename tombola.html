@@ -1,5 +1,22 @@
 <!DOCTYPE html>
 <html lang="it">
+    <script>
+  var password = prompt("Inserisci la password di accesso:");
+  if (password !== "la_tua_password") {
+    alert("Password errata. Accesso negato.");
+    window.location.href = "https://www.google.com"; // reindirizza a una pagina di errore
+  }
+</script>
+
+Sostituisci la_tua_password con la password che vuoi utilizzare. Ad esempio, se vuoi utilizzare la password "tombola2024", il codice dovrebbe essere:
+
+<script>
+  var password = prompt("Inserisci la password di accesso:");
+  if (password !== "tombola2024") {
+    alert("Password errata. Accesso negato.");
+    window.location.href = "https://www.google.com"; // reindirizza a una pagina di errore
+  }
+</script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
