@@ -1,452 +1,58 @@
 <!DOCTYPE html>
 <html lang="it">
-    <!DOCTYPE html>
-<html lang="it">
 <head>
-  <!-- ... -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tombola 'N dialette fruselunese</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    /* Decorazioni natalizie animate */
+    @keyframes snowfall {
+      0% { transform: translateY(-10px) translateX(0); }
+      100% { transform: translateY(100vh) translateX(100px); }
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+    .snowflake {
+      position: fixed;
+      top: -10px;
+      color: white;
+      font-size: 1.5em;
+      animation: snowfall linear infinite;
+    }
+  </style>
 </head>
 <body>
   <script>
     var password = prompt("Inserisci la password di accesso:");
-    if (password === "tombola2024") {
-      // codice della tombola
-    } else {
+    if (password !== "tombola2024") {
       alert("Password errata. Accesso negato.");
       window.location.href = "https://www.google.com";
     }
   </script>
-  <!-- contenuto della tombola -->
-</body>
-</html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tombola 'N dialette fruselunese</title>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { 
-            margin: 0; 
-            padding: 0; 
-            font-family: system-ui, -apple-system, sans-serif;
-        }
-        
-        /* Decorazioni natalizie animate */
-        @keyframes snowfall {
-            0% { transform: translateY(-10px) translateX(0); }
-            100% { transform: translateY(100vh) translateX(100px); }
-        }
-        
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
-        }
-        
-        .snowflake {
-            position: fixed;
-            top: -10px;
-            color: white;
-            font-size: 1.5em;
-            animation: snowfall linear infinite;
-            pointer-events: none;
-            z-index: 1000;
-        }
-        
-        .star {
-            position: fixed;
-            color: gold;
-            font-size: 1.2em;
-            animation: twinkle 2s ease-in-out infinite;
-            pointer-events: none;
-            z-index: 999;
-        }
-    </style>
-</head>
-<body>
-    <div id="root"></div>
-
-    <script type="text/babel">
-        const { useState } = React;
-
-        // Icone SVG semplici
-        const Volume2 = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>;
-        const VolumeX = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>;
-        const RotateCcw = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>;
-        const Trophy = () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>;
-        const Sparkles = ({size}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path><path d="M5 3v4"></path><path d="M19 17v4"></path><path d="M3 5h4"></path><path d="M17 19h4"></path></svg>;
-
-        const TombolaGame = () => {
-            const [extractedNumbers, setExtractedNumbers] = useState([]);
-            const [currentNumber, setCurrentNumber] = useState(null);
-            const [isAnimating, setIsAnimating] = useState(false);
-            const [audioEnabled, setAudioEnabled] = useState(true);
-            const [markedNumbers, setMarkedNumbers] = useState({});
-            const [prizes, setPrizes] = useState({
-                ambo: [], terno: [], quaterna: [], cinquina: [], tombola: null
-            });
-            const [isFullscreen, setIsFullscreen] = useState(false);
-
-            const smorfiaFrusinate = {
-                1: "Glie Campanile", 2: "Le cioce", 3: "Santa Fregna", 4: "La Ciuciarìa", 5: "Rizziero",
-                6: "Glie strùmmele", 7: "La glippa", 8: "Glie cungone", 9: "Cecaturde", 10: "Sagne i faciole",
-                11: "La radeca", 12: "Glie faone", 13: "Sant'Antonie", 14: "Maria Necola", 15: "Glie Distrette",
-                16: "Funtana De Carolis", 17: "Le Funtanelle", 18: "La Cosa", 19: "Glie Schioppe", 20: "Ss. Suluerie i Rumisda",
-                21: "Banda Romagnoli", 22: "Le carruzzette", 23: "Buce de cule", 24: "Anfiteatre Abbelate", 25: "Natale",
-                26: "Glie cuccetieglie", 27: "San Paganine", 28: "L'abbalia", 29: "Brauante", 30: "Gli fine fine",
-                31: "Glie mischiette de Magale", 32: "La Pruincia", 33: "I fratelli Catalano", 34: "Maniane", 35: "La Santissema",
-                36: "Sante Glibbratore", 37: "Madonna della Glibbra", 38: "Glie Dispenzarie", 39: "La Uia Noua", 40: "Curva Zallocche",
-                41: "Funtana Bussi", 42: "La Tipugrafeca", 43: "La Scola Tirauante", 44: "Colle Campagiorne", 45: "Piazza dell'Erua",
-                46: "Uia de glie Carbunare", 47: "Colle Cutturine", 48: "Burgitte", 49: "Glie Grattacièle", 50: "Brunella",
-                51: "Glie Tunnel", 52: "Ponte La Funtana", 53: "La Mola Uecchia", 54: "Glie Matusa", 55: "Gli'urganette",
-                56: "Glie cutefù", 57: "Glie ciufalitte", 58: "Glie saltarelle", 59: "Gli zampugnare", 60: "Ustaria De Matteise",
-                61: "Glie stunneture", 62: "La scifa", 63: "Glie sgummarieglie", 64: "Glie seriglie", 65: "Glie serieglie",
-                66: "Glie falecone", 67: "Glie fallone", 68: "Glie tutere", 69: "A capecule", 70: "Gli sime calate",
-                71: "Glie strunze", 72: "Uia de glie cacature", 73: "L'Ammazzatora", 74: "Glie Giardine", 75: "Santa Glisabbetta",
-                76: "Porta Romana", 77: "Glie Beluedere", 78: "Patacca", 79: "Piazza Garebalde", 80: "Glie Munumente",
-                81: "Sciampioné", 82: "Fignuitte", 83: "Cattacéca", 84: "Gl'Amute", 85: "Tittine",
-                86: "'Mbriaghella", 87: "Gli Pelune", 88: "Madonna de la Cercia", 89: "La Stècena", 90: "La uermenara"
-            };
-
-            const generateCards = () => {
-                const cards = [];
-                for (let cardIdx = 0; cardIdx < 6; cardIdx++) {
-                    const card = [];
-                    const usedNumbers = new Set();
-                    for (let row = 0; row < 3; row++) {
-                        const rowNumbers = [];
-                        const columns = new Set();
-                        while (rowNumbers.length < 5) {
-                            const col = Math.floor(Math.random() * 9);
-                            if (columns.has(col)) continue;
-                            const min = col === 0 ? 1 : col * 10;
-                            const max = col === 0 ? 9 : col === 8 ? 90 : (col * 10) + 9;
-                            const availableNums = [];
-                            for (let n = min; n <= max; n++) {
-                                if (!usedNumbers.has(n)) availableNums.push(n);
-                            }
-                            if (availableNums.length > 0) {
-                                const num = availableNums[Math.floor(Math.random() * availableNums.length)];
-                                rowNumbers.push({ col, num });
-                                columns.add(col);
-                                usedNumbers.add(num);
-                            }
-                        }
-                        rowNumbers.sort((a, b) => a.col - b.col);
-                        const fullRow = Array(9).fill(null);
-                        rowNumbers.forEach(({col, num}) => { fullRow[col] = num; });
-                        card.push(fullRow);
-                    }
-                    cards.push(card);
-                }
-                return cards;
-            };
-
-            const [cards] = useState(generateCards());
-
-            const speakNumber = (num) => {
-                if (!audioEnabled || !window.speechSynthesis) return;
-                const utterance = new SpeechSynthesisUtterance();
-                utterance.text = `Numero ${num}. ${smorfiaFrusinate[num]}`;
-                utterance.lang = 'it-IT';
-                utterance.rate = 0.9;
-                utterance.pitch = 1;
-                window.speechSynthesis.speak(utterance);
-            };
-
-            const extractNumber = () => {
-                if (extractedNumbers.length === 90 || isAnimating) return;
-                const availableNumbers = Array.from({length: 90}, (_, i) => i + 1)
-                    .filter(n => !extractedNumbers.includes(n));
-                const randomNum = availableNumbers[Math.floor(Math.random() * availableNumbers.length)];
-                setIsAnimating(true);
-                setCurrentNumber(randomNum);
-                setTimeout(() => {
-                    const newExtracted = [...extractedNumbers, randomNum];
-                    setExtractedNumbers(newExtracted);
-                    setIsAnimating(false);
-                    speakNumber(randomNum);
-                    checkPrizes(randomNum);
-                }, 1000);
-            };
-
-            const checkPrizes = (newNum) => {
-                [0, 1, 2, 3, 4, 5].forEach(cardIdx => {
-                    const card = cards[cardIdx];
-                    card.forEach((row, rowIdx) => {
-                        const nums = row.filter(n => n !== null);
-                        const marked = nums.filter(n => [...extractedNumbers, newNum].includes(n));
-                        const key = `${cardIdx}-${rowIdx}`;
-                        if (marked.length === 2 && !prizes.ambo.includes(key)) {
-                            setPrizes(p => ({...p, ambo: [...p.ambo, key]}));
-                        }
-                        if (marked.length === 3 && !prizes.terno.includes(key)) {
-                            setPrizes(p => ({...p, terno: [...p.terno, key]}));
-                        }
-                        if (marked.length === 4 && !prizes.quaterna.includes(key)) {
-                            setPrizes(p => ({...p, quaterna: [...p.quaterna, key]}));
-                        }
-                        if (marked.length === 5 && !prizes.cinquina.includes(key)) {
-                            setPrizes(p => ({...p, cinquina: [...p.cinquina, key]}));
-                        }
-                    });
-                    const allNums = card.flat().filter(n => n !== null);
-                    const allMarked = allNums.filter(n => [...extractedNumbers, newNum].includes(n));
-                    if (allMarked.length === 15 && prizes.tombola === null) {
-                        setPrizes(p => ({...p, tombola: cardIdx}));
-                    }
-                });
-            };
-
-            const toggleNumber = (cardIdx, num) => {
-                const key = `${cardIdx}-${num}`;
-                setMarkedNumbers(prev => ({...prev, [key]: !prev[key]}));
-            };
-
-            const reset = () => {
-                setExtractedNumbers([]);
-                setCurrentNumber(null);
-                setMarkedNumbers({});
-                setPrizes({ambo: [], terno: [], quaterna: [], cinquina: [], tombola: null});
-            };
-
-            const toggleFullscreen = () => {
-                setIsFullscreen(!isFullscreen);
-            };
-
-            const generateBoard = () => {
-                return [
-                    [1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 21, 22, 23, 24, 25],
-                    [6, 7, 8, 9, 10, 16, 17, 18, 19, 20, 26, 27, 28, 29, 30],
-                    [31, 32, 33, 34, 35, 41, 42, 43, 44, 45, 51, 52, 53, 54, 55],
-                    [36, 37, 38, 39, 40, 46, 47, 48, 49, 50, 56, 57, 58, 59, 60],
-                    [61, 62, 63, 64, 65, 71, 72, 73, 74, 75, 81, 82, 83, 84, 85],
-                    [66, 67, 68, 69, 70, 76, 77, 78, 79, 80, 86, 87, 88, 89, 90]
-                ];
-            };
-
-            const boardQuindicine = generateBoard();
-
-            const getImagePath = (num) => {
-                return `${num}.jpg`;
-            };
-
-            return (
-                <div className="min-h-screen bg-gradient-to-br from-red-900 via-red-800 to-green-900 p-4">
-                    {/* Decorazioni natalizie */}
-                    {[...Array(15)].map((_, i) => (
-                        <div key={`snow-${i}`} className="snowflake" 
-                             style={{
-                                 left: `${Math.random() * 100}%`,
-                                 animationDuration: `${5 + Math.random() * 10}s`,
-                                 animationDelay: `${Math.random() * 5}s`
-                             }}>
-                            ❄️
-                        </div>
-                    ))}
-                    {[...Array(10)].map((_, i) => (
-                        <div key={`star-${i}`} className="star"
-                             style={{
-                                 left: `${Math.random() * 100}%`,
-                                 top: `${Math.random() * 100}%`,
-                                 animationDelay: `${Math.random() * 2}s`
-                             }}>
-                            ⭐
-                        </div>
-                    ))}
-                    
-                    {/* Header */}
-                    <div className="max-w-7xl mx-auto mb-6 text-center">
-                        <div className="bg-gradient-to-r from-blue-700 via-blue-500 to-blue-700 rounded-t-2xl p-8 border-4 border-t-4 border-x-4 border-yellow-400 relative overflow-hidden">
-                            {/* Foto panoramica di sfondo */}
-                            <img src="frosinone.jpg" alt="Frosinone panorama" 
-                                 className="absolute inset-0 w-full h-full object-cover opacity-40"
-                                 onError={(e) => {e.target.style.display = 'none'}} />
-                            
-                            {/* Logo del gruppo dialetto in alto a destra */}
-                            <img src="logo.png" alt="Logo gruppo dialetto" 
-                                 className="absolute top-4 right-4 w-24 h-24 object-contain z-20 drop-shadow-lg"
-                                 onError={(e) => {e.target.style.display = 'none'}} />
-                            
-                            <div className="relative z-10">
-                                <div className="text-6xl font-black text-white mb-2" style={{textShadow: '4px 4px 8px rgba(0,0,0,0.7)'}}>
-                                    FRUSENONE
-                                </div>
-                                <div className="text-3xl text-yellow-200 font-bold">La Ciuciaria</div>
-                            </div>
-                        </div>
-                        <div className="bg-white/10 backdrop-blur-sm rounded-b-2xl p-6 border-4 border-b-4 border-x-4 border-yellow-400 shadow-2xl">
-                            <div className="flex items-center justify-center gap-4 mb-2">
-                                <Sparkles size={32} />
-                                <h1 className="text-5xl font-bold text-white" style={{textShadow: '3px 3px 0 #b91c1c, -1px -1px 0 #15803d'}}>
-                                    🎄 TOMBULA 🎄
-                                </h1>
-                                <Sparkles size={32} />
-                            </div>
-                            <p className="text-yellow-200 text-2xl font-bold">'N dialette fruselunese</p>
-                            <p className="text-yellow-100 text-lg mt-2">Tradezione Ciuciara • Buon Natale! 🎅</p>
-                        </div>
-                    </div>
-
-                    {/* Controlli */}
-                    <div className="max-w-7xl mx-auto mb-6 flex gap-4 justify-center flex-wrap">
-                        <button onClick={extractNumber} disabled={extractedNumbers.length === 90 || isAnimating}
-                            className="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white font-bold py-4 px-8 rounded-xl shadow-lg transform transition hover:scale-105 text-xl">
-                            🎲 Caccia ne nummere
-                        </button>
-                        <button onClick={reset} className="bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg transform transition hover:scale-105 flex items-center gap-2">
-                            <RotateCcw />
-                            Recumenza
-                        </button>
-                        <button onClick={() => setAudioEnabled(!audioEnabled)}
-                            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg transform transition hover:scale-105 flex items-center gap-2">
-                            {audioEnabled ? <Volume2 /> : <VolumeX />}
-                            Audio
-                        </button>
-                        <button onClick={toggleFullscreen}
-                            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg transform transition hover:scale-105">
-                            🖥️ Tabellone schermo intero
-                        </button>
-                    </div>
-
-                    {/* Numero corrente */}
-                    {currentNumber && (
-                        <div className="max-w-7xl mx-auto mb-6">
-                            <div className={`bg-white rounded-3xl p-8 shadow-2xl border-8 border-yellow-400 text-center ${isAnimating ? 'animate-bounce' : ''}`}>
-                                {/* Foto del numero estratto */}
-                                <div className="mb-6 rounded-2xl overflow-hidden border-4 border-red-700 mx-auto bg-gray-200" style={{maxWidth: '500px', height: '400px'}}>
-                                    <img 
-                                        src={getImagePath(currentNumber)} 
-                                        alt={smorfiaFrusinate[currentNumber]} 
-                                        className="w-full h-full object-cover"
-                                        onError={(e) => {
-                                            e.target.style.display = 'none';
-                                            e.target.parentElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:2em;color:#666;">📷 Foto non trovata</div>';
-                                        }} 
-                                    />
-                                </div>
-                                <div className="text-8xl font-bold text-red-700 mb-4">{currentNumber}</div>
-                                <div className="text-3xl text-gray-700 font-semibold">{smorfiaFrusinate[currentNumber]}</div>
-                                <div className="mt-4 text-xl text-gray-600">Estratti: {extractedNumbers.length}/90</div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Banner numeri estratti */}
-                    {extractedNumbers.length > 0 && (
-                        <div className="max-w-7xl mx-auto mb-6">
-                            <div className="bg-yellow-400 rounded-2xl p-6 shadow-2xl border-4 border-yellow-600">
-                                <h2 className="text-2xl font-bold text-center mb-4 text-red-700">
-                                    📋 NUMERI ESTRATTI: {extractedNumbers.length}/90
-                                </h2>
-                                <div className="flex flex-wrap gap-2 justify-center">
-                                    {extractedNumbers.map(num => (
-                                        <div key={num} className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-xl shadow-md">{num}</div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* TABELLONE CON FOTO LOCALI E DISPOSIZIONE CORRETTA */}
-                    <div className={`${isFullscreen ? 'fixed inset-0 z-50 bg-gradient-to-br from-red-900 via-red-800 to-green-900 overflow-auto' : ''}`}>
-                        {isFullscreen && (
-                            <div className="fixed top-4 left-0 right-0 z-50 flex justify-between px-4">
-                                <button onClick={extractNumber} disabled={extractedNumbers.length === 90 || isAnimating}
-                                    className="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg transform transition hover:scale-105">
-                                    🎲 Caccia 'ne nummere
-                                </button>
-                                <button onClick={toggleFullscreen}
-                                    className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg">
-                                    ✕ Chiudi
-                                </button>
-                            </div>
-                        )}
-                        <div className={`${isFullscreen ? 'p-8 pt-24' : 'max-w-7xl mx-auto mb-8'}`}>
-                            {/* Numero corrente a schermo intero */}
-                            {isFullscreen && currentNumber && (
-                                <div className="mb-6">
-                                    <div className={`bg-white rounded-3xl p-6 shadow-2xl border-8 border-yellow-400 text-center ${isAnimating ? 'animate-bounce' : ''}`}>
-                                        <div className="flex gap-6">
-                                            {/* Foto */}
-                                            <div className="flex-1 rounded-2xl overflow-hidden border-4 border-red-700 bg-gray-200" style={{maxWidth: '400px', height: '300px'}}>
-                                                <img 
-                                                    src={getImagePath(currentNumber)} 
-                                                    alt={smorfiaFrusinate[currentNumber]} 
-                                                    className="w-full h-full object-cover"
-                                                    onError={(e) => {
-                                                        e.target.style.display = 'none';
-                                                        e.target.parentElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:2em;color:#666;">📷 Foto non trovata</div>';
-                                                    }} 
-                                                />
-                                            </div>
-                                            {/* Info numero */}
-                                            <div className="flex-1 flex flex-col justify-center">
-                                                <div className="text-8xl font-bold text-red-700 mb-2">{currentNumber}</div>
-                                                <div className="text-3xl text-gray-700 font-semibold">{smorfiaFrusinate[currentNumber]}</div>
-                                                <div className="mt-4 text-xl text-gray-600">Estratti: {extractedNumbers.length}/90</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                            <div className="bg-white rounded-2xl p-6 shadow-2xl border-4 border-red-700">
-                                <h2 className="text-3xl font-bold text-center mb-6 text-red-700">📋 GLIE TABELLONE</h2>
-                                <div className="grid grid-cols-2 gap-6">
-                                    {boardQuindicine.map((quindicina, qIdx) => (
-                                        <div key={qIdx} className="border-4 border-blue-500 rounded-xl p-4 bg-blue-50">
-                                            <div className="grid grid-cols-5 gap-2">
-                                                {quindicina.map(num => {
-                                                    const isExtracted = extractedNumbers.indexOf(num) !== -1;
-                                                    return (
-                                                        <div key={num} style={{
-                                                            backgroundColor: isExtracted ? '#dc2626' : '#f3f4f6',
-                                                            color: isExtracted ? 'white' : '#1f2937',
-                                                            borderWidth: isExtracted ? '5px' : '2px',
-                                                            borderStyle: 'solid',
-                                                            borderColor: isExtracted ? '#991b1b' : '#9ca3af',
-                                                            boxShadow: isExtracted ? '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 0 0 6px #fbbf24, 0 0 0 8px #991b1b' : 'none',
-                                                            transform: isExtracted ? 'scale(1.05)' : 'scale(1)',
-                                                            transition: 'all 0.3s'
-                                                        }} className="flex flex-col items-center justify-center p-2 rounded-lg min-h-[110px] relative overflow-hidden">
-                                                            {/* FOTO LOCALE */}
-                                                            <img src={getImagePath(num)} alt={smorfiaFrusinate[num]} 
-                                                                 className="absolute inset-0 w-full h-full object-cover opacity-75"
-                                                                 onError={(e) => {e.target.style.display = 'none'}} />
-                                                            
-                                                            {/* Numero in alto a sinistra */}
-                                                            <div className="absolute top-1 left-1 text-2xl font-black z-10 bg-white/90 px-2 py-1 rounded" 
-                                                                 style={{color: '#1f2937'}}>{num}</div>
-                                                            
-                                                            <div className="text-[0.6rem] text-center font-semibold leading-tight mt-auto relative z-10"
-                                                                 style={{color: isExtracted ? '#fef3c7' : '#4b5563'}}>
-                                                                {smorfiaFrusinate[num]}
-                                                            </div>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Footer */}
-                    <div className="max-w-7xl mx-auto mt-8 text-center">
-                        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border-2 border-yellow-400">
-                            <p className="text-yellow-200 text-lg">
-                                🎅 BONE FESTE da FRUSENONE! 🎄 ⭐
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        ReactDOM.render(<TombolaGame />, document.getElementById('root'));
-    </script>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState } = React;
+    // Icone SVG semplici
+    const Volume2 = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>;
+    const VolumeX = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>;
+    const RotateCcw = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>;
+    const Trophy = () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>;
+    const Sparkles = ({size}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path><path d="M5 3v4"></path><path d="M19 17v4"></path><path d="M3 5h4"></path><path d="M17 19h4"></path></svg>;
+    const TombolaGame = () => {
+      // ...
+    };
+    ReactDOM.render(<TombolaGame />, document.getElementById('root'));
+  </script>
 </body>
 </html>
