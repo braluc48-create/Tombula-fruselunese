@@ -54,7 +54,6 @@
         const Volume2 = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>;
         const VolumeX = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>;
         const RotateCcw = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>;
-        const Trophy = () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>;
         const Sparkles = ({size}) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path><path d="M5 3v4"></path><path d="M19 17v4"></path><path d="M3 5h4"></path><path d="M17 19h4"></path></svg>;
 
         const TombolaGame = () => {
@@ -62,10 +61,6 @@
             const [currentNumber, setCurrentNumber] = useState(null);
             const [isAnimating, setIsAnimating] = useState(false);
             const [audioEnabled, setAudioEnabled] = useState(true);
-            const [markedNumbers, setMarkedNumbers] = useState({});
-            const [prizes, setPrizes] = useState({
-                ambo: [], terno: [], quaterna: [], cinquina: [], tombola: null
-            });
             const [isFullscreen, setIsFullscreen] = useState(false);
             const audioRef = useRef(null);
 
@@ -90,67 +85,25 @@
                 86: "'Mbriaghella", 87: "Gli Pelune", 88: "Madonna de la Cercia", 89: "La Stècena", 90: "La uermenara"
             };
 
-            const generateCards = () => {
-                const cards = [];
-                for (let cardIdx = 0; cardIdx < 6; cardIdx++) {
-                    const card = [];
-                    const usedNumbers = new Set();
-                    for (let row = 0; row < 3; row++) {
-                        const rowNumbers = [];
-                        const columns = new Set();
-                        while (rowNumbers.length < 5) {
-                            const col = Math.floor(Math.random() * 9);
-                            if (columns.has(col)) continue;
-                            const min = col === 0 ? 1 : col * 10;
-                            const max = col === 0 ? 9 : col === 8 ? 90 : (col * 10) + 9;
-                            const availableNums = [];
-                            for (let n = min; n <= max; n++) {
-                                if (!usedNumbers.has(n)) availableNums.push(n);
-                            }
-                            if (availableNums.length > 0) {
-                                const num = availableNums[Math.floor(Math.random() * availableNums.length)];
-                                rowNumbers.push({ col, num });
-                                columns.add(col);
-                                usedNumbers.add(num);
-                            }
-                        }
-                        rowNumbers.sort((a, b) => a.col - b.col);
-                        const fullRow = Array(9).fill(null);
-                        rowNumbers.forEach(({col, num}) => { fullRow[col] = num; });
-                        card.push(fullRow);
-                    }
-                    cards.push(card);
-                }
-                return cards;
-            };
-
-            const [cards] = useState(generateCards());
-
             const speakNumber = (num) => {
                 if (!audioEnabled) return;
                 
-                // Ferma l'audio precedente se in riproduzione
                 if (audioRef.current) {
                     audioRef.current.pause();
                     audioRef.current.currentTime = 0;
                 }
                 
-                // URL del file MP3 su GitHub
                 const mp3Url = `https://braluc48-create.github.io/Tombula-fruselunese/${num}.mp3`;
-                
-                // Crea e riproduci il nuovo audio
                 const audio = new Audio(mp3Url);
                 audioRef.current = audio;
                 
                 audio.play().catch(err => {
                     console.error('Errore riproduzione MP3:', err);
-                    // Fallback alla sintesi vocale se l'MP3 non è disponibile
                     if (window.speechSynthesis) {
                         const utterance = new SpeechSynthesisUtterance();
                         utterance.text = `Numero ${num}. ${smorfiaFrusinate[num]}`;
                         utterance.lang = 'it-IT';
                         utterance.rate = 0.9;
-                        utterance.pitch = 1;
                         window.speechSynthesis.speak(utterance);
                     }
                 });
@@ -164,45 +117,10 @@
                 setIsAnimating(true);
                 setCurrentNumber(randomNum);
                 setTimeout(() => {
-                    const newExtracted = [...extractedNumbers, randomNum];
-                    setExtractedNumbers(newExtracted);
+                    setExtractedNumbers([...extractedNumbers, randomNum]);
                     setIsAnimating(false);
                     speakNumber(randomNum);
-                    checkPrizes(randomNum);
                 }, 1000);
-            };
-
-            const checkPrizes = (newNum) => {
-                [0, 1, 2, 3, 4, 5].forEach(cardIdx => {
-                    const card = cards[cardIdx];
-                    card.forEach((row, rowIdx) => {
-                        const nums = row.filter(n => n !== null);
-                        const marked = nums.filter(n => [...extractedNumbers, newNum].includes(n));
-                        const key = `${cardIdx}-${rowIdx}`;
-                        if (marked.length === 2 && !prizes.ambo.includes(key)) {
-                            setPrizes(p => ({...p, ambo: [...p.ambo, key]}));
-                        }
-                        if (marked.length === 3 && !prizes.terno.includes(key)) {
-                            setPrizes(p => ({...p, terno: [...p.terno, key]}));
-                        }
-                        if (marked.length === 4 && !prizes.quaterna.includes(key)) {
-                            setPrizes(p => ({...p, quaterna: [...p.quaterna, key]}));
-                        }
-                        if (marked.length === 5 && !prizes.cinquina.includes(key)) {
-                            setPrizes(p => ({...p, cinquina: [...p.cinquina, key]}));
-                        }
-                    });
-                    const allNums = card.flat().filter(n => n !== null);
-                    const allMarked = allNums.filter(n => [...extractedNumbers, newNum].includes(n));
-                    if (allMarked.length === 15 && prizes.tombola === null) {
-                        setPrizes(p => ({...p, tombola: cardIdx}));
-                    }
-                });
-            };
-
-            const toggleNumber = (cardIdx, num) => {
-                const key = `${cardIdx}-${num}`;
-                setMarkedNumbers(prev => ({...prev, [key]: !prev[key]}));
             };
 
             const reset = () => {
@@ -212,8 +130,6 @@
                 }
                 setExtractedNumbers([]);
                 setCurrentNumber(null);
-                setMarkedNumbers({});
-                setPrizes({ambo: [], terno: [], quaterna: [], cinquina: [], tombola: null});
             };
 
             const toggleFullscreen = () => {
@@ -233,9 +149,7 @@
 
             const boardQuindicine = generateBoard();
 
-            const getImagePath = (num) => {
-                return `${num}.jpg`;
-            };
+            const getImagePath = (num) => `${num}.jpg`;
 
             return (
                 <div className="min-h-screen bg-gradient-to-br from-red-900 via-red-800 to-green-900 p-4">
@@ -306,7 +220,7 @@
                         </button>
                         <button onClick={toggleFullscreen}
                             className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg transform transition hover:scale-105">
-                            🖥️ Tabellone schermo intero
+                            🖥️ Tabellone
                         </button>
                     </div>
 
@@ -320,7 +234,7 @@
                                         className="w-full h-full object-cover"
                                         onError={(e) => {
                                             e.target.style.display = 'none';
-                                            e.target.parentElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:2em;color:#666;">📷 Foto non trovata</div>';
+                                            e.target.parentElement.innerHTML = '<div style="display:flex;align-items:center;justify-center;height:100%;font-size:2em;color:#666;">📷</div>';
                                         }} 
                                     />
                                 </div>
@@ -350,8 +264,8 @@
                         {isFullscreen && (
                             <div className="fixed top-4 left-0 right-0 z-50 flex justify-between px-4">
                                 <button onClick={extractNumber} disabled={extractedNumbers.length === 90 || isAnimating}
-                                    className="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg transform transition hover:scale-105">
-                                    🎲 Caccia 'ne nummere
+                                    className="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg">
+                                    🎲 Caccia
                                 </button>
                                 <button onClick={toggleFullscreen}
                                     className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg">
@@ -371,7 +285,7 @@
                                                     className="w-full h-full object-cover"
                                                     onError={(e) => {
                                                         e.target.style.display = 'none';
-                                                        e.target.parentElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:2em;color:#666;">📷 Foto non trovata</div>';
+                                                        e.target.parentElement.innerHTML = '<div style="display:flex;align-items:center;justify-center;height:100%;font-size:2em;color:#666;">📷</div>';
                                                     }} 
                                                 />
                                             </div>
@@ -391,7 +305,7 @@
                                         <div key={qIdx} className="border-4 border-blue-500 rounded-xl p-4 bg-blue-50">
                                             <div className="grid grid-cols-5 gap-2">
                                                 {quindicina.map(num => {
-                                                    const isExtracted = extractedNumbers.indexOf(num) !== -1;
+                                                    const isExtracted = extractedNumbers.includes(num);
                                                     return (
                                                         <div key={num} style={{
                                                             backgroundColor: isExtracted ? '#dc2626' : '#f3f4f6',
@@ -423,4 +337,12 @@
                                 </div>
                             </div>
                         </div>
-                    </div
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<TombolaGame />, document.getElementById('root'));
+    </script>
+</body>
+</html>
