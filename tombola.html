@@ -1,12 +1,36 @@
 <!DOCTYPE html>
 <html lang="it">
+    <!DOCTYPE html>
+<html lang="it">
+<head>
+  <!-- ... -->
+</head>
+<body>
+  <div id="password-container">
+    <input type="password" id="password" placeholder="Inserisci la password" />
+    <button onclick="checkPassword()">Accedi</button>
+  </div>
+  <div id="tombola-container" style="display: none;">
+    <!-- contenuto della tombola -->
     <script>
-  var password = prompt("Inserisci la password di accesso:");
-  if (password !== "tombola2024") {
-    alert("Password errata. Accesso negato.");
-    window.location.href = "https://www.google.com"; // reindirizza a una pagina di errore
-  }
-</script>
+      // codice della tombola
+    </script>
+  </div>
+
+  <script>
+    function checkPassword() {
+      var password = document.getElementById("password").value;
+      if (password === "tombola2024") {
+        document.getElementById("password-container").style.display = "none";
+        document.getElementById("tombola-container").style.display = "block";
+        // inizializza la tombola
+      } else {
+        alert("Password errata");
+      }
+    }
+  </script>
+</body>
+</html>>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
