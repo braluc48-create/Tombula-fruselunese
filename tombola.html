@@ -15,7 +15,6 @@
             font-family: system-ui, -apple-system, sans-serif;
         }
         
-        /* Decorazioni natalizie animate */
         @keyframes snowfall {
             0% { transform: translateY(-10px) translateX(0); }
             100% { transform: translateY(100vh) translateX(100px); }
@@ -50,9 +49,8 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState } = React;
+        const { useState, useRef } = React;
 
-        // Icone SVG semplici
         const Volume2 = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>;
         const VolumeX = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>;
         const RotateCcw = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>;
@@ -69,6 +67,7 @@
                 ambo: [], terno: [], quaterna: [], cinquina: [], tombola: null
             });
             const [isFullscreen, setIsFullscreen] = useState(false);
+            const audioRef = useRef(null);
 
             const smorfiaFrusinate = {
                 1: "Glie Campanile", 2: "Le cioce", 3: "Santa Fregna", 4: "La Ciuciarìa", 5: "Rizziero",
@@ -128,13 +127,33 @@
             const [cards] = useState(generateCards());
 
             const speakNumber = (num) => {
-                if (!audioEnabled || !window.speechSynthesis) return;
-                const utterance = new SpeechSynthesisUtterance();
-                utterance.text = `Numero ${num}. ${smorfiaFrusinate[num]}`;
-                utterance.lang = 'it-IT';
-                utterance.rate = 0.9;
-                utterance.pitch = 1;
-                window.speechSynthesis.speak(utterance);
+                if (!audioEnabled) return;
+                
+                // Ferma l'audio precedente se in riproduzione
+                if (audioRef.current) {
+                    audioRef.current.pause();
+                    audioRef.current.currentTime = 0;
+                }
+                
+                // URL del file MP3 su GitHub
+                const mp3Url = `https://braluc48-create.github.io/Tombula-fruselunese/${num}.mp3`;
+                
+                // Crea e riproduci il nuovo audio
+                const audio = new Audio(mp3Url);
+                audioRef.current = audio;
+                
+                audio.play().catch(err => {
+                    console.error('Errore riproduzione MP3:', err);
+                    // Fallback alla sintesi vocale se l'MP3 non è disponibile
+                    if (window.speechSynthesis) {
+                        const utterance = new SpeechSynthesisUtterance();
+                        utterance.text = `Numero ${num}. ${smorfiaFrusinate[num]}`;
+                        utterance.lang = 'it-IT';
+                        utterance.rate = 0.9;
+                        utterance.pitch = 1;
+                        window.speechSynthesis.speak(utterance);
+                    }
+                });
             };
 
             const extractNumber = () => {
@@ -187,6 +206,10 @@
             };
 
             const reset = () => {
+                if (audioRef.current) {
+                    audioRef.current.pause();
+                    audioRef.current.currentTime = 0;
+                }
                 setExtractedNumbers([]);
                 setCurrentNumber(null);
                 setMarkedNumbers({});
@@ -216,7 +239,6 @@
 
             return (
                 <div className="min-h-screen bg-gradient-to-br from-red-900 via-red-800 to-green-900 p-4">
-                    {/* Decorazioni natalizie */}
                     {[...Array(15)].map((_, i) => (
                         <div key={`snow-${i}`} className="snowflake" 
                              style={{
@@ -238,15 +260,12 @@
                         </div>
                     ))}
                     
-                    {/* Header */}
                     <div className="max-w-7xl mx-auto mb-6 text-center">
                         <div className="bg-gradient-to-r from-blue-700 via-blue-500 to-blue-700 rounded-t-2xl p-8 border-4 border-t-4 border-x-4 border-yellow-400 relative overflow-hidden">
-                            {/* Foto panoramica di sfondo */}
                             <img src="frosinone.jpg" alt="Frosinone panorama" 
                                  className="absolute inset-0 w-full h-full object-cover opacity-40"
                                  onError={(e) => {e.target.style.display = 'none'}} />
                             
-                            {/* Logo del gruppo dialetto in alto a destra */}
                             <img src="logo.png" alt="Logo gruppo dialetto" 
                                  className="absolute top-4 right-4 w-24 h-24 object-contain z-20 drop-shadow-lg"
                                  onError={(e) => {e.target.style.display = 'none'}} />
@@ -271,7 +290,6 @@
                         </div>
                     </div>
 
-                    {/* Controlli */}
                     <div className="max-w-7xl mx-auto mb-6 flex gap-4 justify-center flex-wrap">
                         <button onClick={extractNumber} disabled={extractedNumbers.length === 90 || isAnimating}
                             className="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white font-bold py-4 px-8 rounded-xl shadow-lg transform transition hover:scale-105 text-xl">
@@ -292,11 +310,9 @@
                         </button>
                     </div>
 
-                    {/* Numero corrente */}
                     {currentNumber && (
                         <div className="max-w-7xl mx-auto mb-6">
                             <div className={`bg-white rounded-3xl p-8 shadow-2xl border-8 border-yellow-400 text-center ${isAnimating ? 'animate-bounce' : ''}`}>
-                                {/* Foto del numero estratto */}
                                 <div className="mb-6 rounded-2xl overflow-hidden border-4 border-red-700 mx-auto bg-gray-200" style={{maxWidth: '500px', height: '400px'}}>
                                     <img 
                                         src={getImagePath(currentNumber)} 
@@ -315,7 +331,6 @@
                         </div>
                     )}
 
-                    {/* Banner numeri estratti */}
                     {extractedNumbers.length > 0 && (
                         <div className="max-w-7xl mx-auto mb-6">
                             <div className="bg-yellow-400 rounded-2xl p-6 shadow-2xl border-4 border-yellow-600">
@@ -331,7 +346,6 @@
                         </div>
                     )}
 
-                    {/* TABELLONE CON FOTO LOCALI E DISPOSIZIONE CORRETTA */}
                     <div className={`${isFullscreen ? 'fixed inset-0 z-50 bg-gradient-to-br from-red-900 via-red-800 to-green-900 overflow-auto' : ''}`}>
                         {isFullscreen && (
                             <div className="fixed top-4 left-0 right-0 z-50 flex justify-between px-4">
@@ -346,12 +360,10 @@
                             </div>
                         )}
                         <div className={`${isFullscreen ? 'p-8 pt-24' : 'max-w-7xl mx-auto mb-8'}`}>
-                            {/* Numero corrente a schermo intero */}
                             {isFullscreen && currentNumber && (
                                 <div className="mb-6">
                                     <div className={`bg-white rounded-3xl p-6 shadow-2xl border-8 border-yellow-400 text-center ${isAnimating ? 'animate-bounce' : ''}`}>
                                         <div className="flex gap-6">
-                                            {/* Foto */}
                                             <div className="flex-1 rounded-2xl overflow-hidden border-4 border-red-700 bg-gray-200" style={{maxWidth: '400px', height: '300px'}}>
                                                 <img 
                                                     src={getImagePath(currentNumber)} 
@@ -363,7 +375,6 @@
                                                     }} 
                                                 />
                                             </div>
-                                            {/* Info numero */}
                                             <div className="flex-1 flex flex-col justify-center">
                                                 <div className="text-8xl font-bold text-red-700 mb-2">{currentNumber}</div>
                                                 <div className="text-3xl text-gray-700 font-semibold">{smorfiaFrusinate[currentNumber]}</div>
@@ -392,12 +403,10 @@
                                                             transform: isExtracted ? 'scale(1.05)' : 'scale(1)',
                                                             transition: 'all 0.3s'
                                                         }} className="flex flex-col items-center justify-center p-2 rounded-lg min-h-[110px] relative overflow-hidden">
-                                                            {/* FOTO LOCALE */}
                                                             <img src={getImagePath(num)} alt={smorfiaFrusinate[num]} 
                                                                  className="absolute inset-0 w-full h-full object-cover opacity-75"
                                                                  onError={(e) => {e.target.style.display = 'none'}} />
                                                             
-                                                            {/* Numero in alto a sinistra */}
                                                             <div className="absolute top-1 left-1 text-2xl font-black z-10 bg-white/90 px-2 py-1 rounded" 
                                                                  style={{color: '#1f2937'}}>{num}</div>
                                                             
@@ -414,21 +423,4 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    {/* Footer */}
-                    <div className="max-w-7xl mx-auto mt-8 text-center">
-                        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border-2 border-yellow-400">
-                            <p className="text-yellow-200 text-lg">
-                                🎅 BONE FESTE da FRUSENONE! 🎄 ⭐
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        ReactDOM.render(<TombolaGame />, document.getElementById('root'));
-    </script>
-</body>
-</html>
+                    </div
