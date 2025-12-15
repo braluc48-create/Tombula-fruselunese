@@ -1,2 +1,2 @@
-# Tombula-fruselunese
+# Tombola-fruselunese
 Tombola in dialetto fruselunese
