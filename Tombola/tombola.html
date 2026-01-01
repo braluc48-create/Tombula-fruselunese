@@ -78,8 +78,10 @@
             const [audioEnabled, setAudioEnabled] = useState(true);
             const [isFullscreen, setIsFullscreen] = useState(false);
             const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+            const [visitCount, setVisitCount] = useState(0);
             const audioRef = useRef(null);
             const extractionInProgress = useRef(false);
+            const gameCounted = useRef(false);
 
             const smorfiaFrusinate = {
                 1: "Glie Campanile", 2: "Le cioce", 3: "Santa Fregna", 4: "La Ciuciarìa", 5: "Rizziero",
@@ -101,6 +103,21 @@
                 81: "Sciampionné", 82: "Fignuitte", 83: "Cattacéca", 84: "Gl'Amute", 85: "Tittine",
                 86: "'Mbriaghella", 87: "Gli Pelune", 88: "Madonna de la Cercia", 89: "La Stécena", 90: "La uermenara"
             };
+
+            // Carica il contatore partite al caricamento
+            React.useEffect(() => {
+                const loadGameCount = async () => {
+                    try {
+                        const result = await window.storage.get('tombola-games', true);
+                        const currentCount = result ? parseInt(result.value) : 0;
+                        setVisitCount(currentCount);
+                    } catch (error) {
+                        console.error('Errore caricamento contatore:', error);
+                    }
+                };
+                
+                loadGameCount();
+            }, []);
 
             const speakNumber = (num) => {
                 if (!audioEnabled || isPlayingAudio) return;
@@ -144,9 +161,27 @@
                 });
             };
 
+            const incrementGameCounter = async () => {
+                try {
+                    const result = await window.storage.get('tombola-games', true);
+                    const currentCount = result ? parseInt(result.value) : 0;
+                    const newCount = currentCount + 1;
+                    await window.storage.set('tombola-games', newCount.toString(), true);
+                    setVisitCount(newCount);
+                } catch (error) {
+                    console.error('Errore incremento contatore:', error);
+                }
+            };
+
             const extractNumber = () => {
                 if (extractedNumbers.length === 90 || isAnimating || extractionInProgress.current) {
                     return;
+                }
+                
+                // Incrementa il contatore solo alla prima estrazione
+                if (extractedNumbers.length === 0 && !gameCounted.current) {
+                    gameCounted.current = true;
+                    incrementGameCounter();
                 }
                 
                 extractionInProgress.current = true;
@@ -174,6 +209,7 @@
                 }
                 setIsPlayingAudio(false);
                 extractionInProgress.current = false;
+                gameCounted.current = false;
                 setExtractedNumbers([]);
                 setCurrentNumber(null);
             };
@@ -222,6 +258,11 @@
                             <div className="relative z-10">
                                 <div className="text-3xl md:text-6xl font-black text-white mb-1 md:mb-2" style={{textShadow: '4px 4px 8px rgba(0,0,0,0.7)'}}>FRUSENONE</div>
                                 <div className="text-xl md:text-3xl text-yellow-200 font-bold">La Ciuciaria</div>
+                                {visitCount > 0 && (
+                                    <div className="mt-2 text-sm md:text-lg text-white/80 font-semibold">
+                                        🎲 Partite giocate: {visitCount.toLocaleString('it-IT')}
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <div className="bg-white/10 backdrop-blur-sm rounded-b-2xl p-3 md:p-4 border-4 border-b-4 border-x-4 border-yellow-400 shadow-2xl">
@@ -237,7 +278,7 @@
                     <div className="max-w-7xl mx-auto mb-4 md:mb-6 flex gap-2 md:gap-4 justify-center flex-wrap px-2">
                         <button onClick={extractNumber} disabled={extractedNumbers.length === 90 || isAnimating || isPlayingAudio}
                             className="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white font-bold py-3 md:py-4 px-4 md:px-8 rounded-xl shadow-lg transform transition hover:scale-105 text-base md:text-xl">
-                            🎲 Caccia
+                            🎲 Caccia 'ne nummere
                         </button>
                         <button onClick={reset} className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 md:py-4 px-4 md:px-6 rounded-xl shadow-lg transform transition hover:scale-105 flex items-center gap-2 text-base md:text-xl">
                             <RotateCcw /> Reset
@@ -281,7 +322,7 @@
                         {isFullscreen && (
                             <div className="fixed top-4 left-0 right-0 z-50 flex justify-between px-4">
                                 <button onClick={extractNumber} disabled={extractedNumbers.length === 90 || isAnimating || isPlayingAudio}
-                                    className="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg">🎲 Caccia</button>
+                                    className="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg">🎲 Caccia 'ne nummere</button>
                                 <button onClick={toggleFullscreen} className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg">✕ Chiudi</button>
                             </div>
                         )}
