@@ -107,25 +107,29 @@
             React.useEffect(() => {
                 const incrementAccessCount = async () => {
                     try {
-                        // Usa storage condiviso per contare tutti gli accessi
-                        let currentCount;
+                        // Prova prima con l'API di conteggio
+                        const response = await fetch('https://api.countapi.xyz/hit/tombola-fruselunese-2025/accessi', {
+                            method: 'GET',
+                            mode: 'cors'
+                        });
                         
-                        try {
-                            const result = await window.storage.get('tombola-accessi-globale', true);
-                            currentCount = result ? parseInt(result.value) : 99; // Parte da 99, diventerà 100 al primo accesso
-                        } catch (error) {
-                            // Se la chiave non esiste, inizializza a 99
-                            currentCount = 99;
+                        if (response.ok) {
+                            const data = await response.json();
+                            setVisitCount(data.value + 99); // Parte da 100
+                        } else {
+                            throw new Error('API non disponibile');
                         }
-                        
-                        // Incrementa il contatore
-                        currentCount = currentCount + 1;
-                        
-                        await window.storage.set('tombola-accessi-globale', currentCount.toString(), true);
-                        setVisitCount(currentCount);
                     } catch (error) {
-                        console.error('Errore contatore accessi:', error);
-                        setVisitCount(100); // Fallback
+                        console.error('Errore contatore globale, uso localStorage:', error);
+                        // Fallback su localStorage
+                        try {
+                            const stored = localStorage.getItem('tombola-accessi-locale');
+                            let currentCount = stored ? parseInt(stored) + 1 : 100;
+                            localStorage.setItem('tombola-accessi-locale', currentCount.toString());
+                            setVisitCount(currentCount);
+                        } catch (e) {
+                            setVisitCount(100);
+                        }
                     }
                 };
                 
