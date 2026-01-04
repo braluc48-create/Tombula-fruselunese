@@ -100,32 +100,36 @@
                 71: "Glie strunze", 72: "Uia de glie cacature", 73: "L'Ammazzatora", 74: "Glie Giardine", 75: "Santa Glisabbetta",
                 76: "Porta Romana", 77: "Glie Beluedere", 78: "Patacca", 79: "Piazza Garebalde", 80: "Glie Munumente",
                 81: "Sciampionné", 82: "Fignuitte", 83: "Cattacéca", 84: "Gl'Amute", 85: "Tittine",
-                86: "'Mbriaghella", 87: "Gli Pelune", 88: "Madonna de la Cercia", 89: "La Stécena", 90: "La uermenara"
+                86: "'Mbriachella", 87: "Gli Pelune", 88: "Madonna de la Cercia", 89: "La Stécena", 90: "La uermenara"
             };
 
             // Carica e incrementa il contatore accessi al caricamento
             React.useEffect(() => {
                 const incrementAccessCount = async () => {
                     try {
-                        // Usa storage condiviso per contare tutti gli accessi
-                        let currentCount;
+                        // Prova prima con l'API di conteggio
+                        const response = await fetch('https://api.countapi.xyz/hit/tombola-fruselunese-2025/accessi', {
+                            method: 'GET',
+                            mode: 'cors'
+                        });
                         
-                        try {
-                            const result = await window.storage.get('tombola-accessi-globale', true);
-                            currentCount = result ? parseInt(result.value) : 99; // Parte da 99, diventerà 100 al primo accesso
-                        } catch (error) {
-                            // Se la chiave non esiste, inizializza a 99
-                            currentCount = 99;
+                        if (response.ok) {
+                            const data = await response.json();
+                            setVisitCount(data.value + 99); // Parte da 100
+                        } else {
+                            throw new Error('API non disponibile');
                         }
-                        
-                        // Incrementa il contatore
-                        currentCount = currentCount + 1;
-                        
-                        await window.storage.set('tombola-accessi-globale', currentCount.toString(), true);
-                        setVisitCount(currentCount);
                     } catch (error) {
-                        console.error('Errore contatore accessi:', error);
-                        setVisitCount(100); // Fallback
+                        console.error('Errore contatore globale, uso localStorage:', error);
+                        // Fallback su localStorage
+                        try {
+                            const stored = localStorage.getItem('tombola-accessi-locale');
+                            let currentCount = stored ? parseInt(stored) + 1 : 100;
+                            localStorage.setItem('tombola-accessi-locale', currentCount.toString());
+                            setVisitCount(currentCount);
+                        } catch (e) {
+                            setVisitCount(100);
+                        }
                     }
                 };
                 
@@ -276,7 +280,7 @@
                             {audioEnabled ? <Volume2 /> : <VolumeX />}
                         </button>
                         <button onClick={toggleFullscreen}
-                            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 md:py-4 px-4 md:px-6 rounded-xl shadow-lg transform transition hover:scale-105 text-base md:text-xl">🖥️</button>
+                            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 md:py-4 px-4 md:px-6 rounded-xl shadow-lg transform transition hover:scale-105 text-base md:text-xl">📋 TABELLONE</button>
                         
                         <div className="bg-yellow-400 text-red-700 font-bold py-3 md:py-4 px-4 md:px-6 rounded-xl shadow-lg text-base md:text-xl border-2 md:border-4 border-yellow-600">
                             👁️ Accessi: {visitCount.toLocaleString('it-IT')}
@@ -383,4 +387,3 @@
         ReactDOM.render(<TombolaGame />, document.getElementById('root'));
     </script>
 </body>
-</html>
