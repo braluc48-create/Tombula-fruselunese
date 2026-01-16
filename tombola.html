@@ -115,35 +115,7 @@
                 86: "'Mbriachella", 87: "Gli Pelune", 88: "Madonna de la Cercia", 89: "La Stécena", 90: "La uermenara"
             };
 
-            React.useEffect(() => {
-  const KEY = 'tombola_fruselunese_visite';
-  const namespace = 'braluc48';
-  const key = 'tombola_fruselunese';
-  const url = `https://api.countapi.xyz/hit/${encodeURIComponent(namespace)}/${encodeURIComponent(key)}`;
-
-  fetch(url)
-    .then(res => {
-      if (!res.ok) throw new Error('CountAPI non disponibile');
-      return res.json();
-    })
-    .then(data => {
-      if (data && typeof data.value === 'number') {
-        setVisitCount(data.value);
-        localStorage.setItem(KEY, String(data.value));
-      } else {
-        let saved = parseInt(localStorage.getItem(KEY) || '499', 10);
-        saved = saved + 1;
-        localStorage.setItem(KEY, String(saved));
-        setVisitCount(saved);
-      }
-    })
-    .catch(() => {
-      let saved = parseInt(localStorage.getItem(KEY) || '499', 10);
-      saved = saved + 1;
-      localStorage.setItem(KEY, String(saved));
-      setVisitCount(saved);
-    });
-}, []);
+            
             const speakNumber = (num) => {
                 if (!audioEnabled || isPlayingAudio) return;
                 
