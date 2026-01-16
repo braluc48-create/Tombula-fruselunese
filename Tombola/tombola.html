@@ -116,7 +116,7 @@
             };
 
             React.useEffect(() => {
-  const url = 'https://api.countapi.xyz/hit/braluc48/tombola_fruselunese';
+  const url = 'https://countapi-js.vercel.app/hit/braluc48/tombola_fruselunese';
 
   fetch(url)
     .then(res => res.json())
@@ -126,7 +126,7 @@
       }
     })
     .catch(() => {
-      setVisitCount(0); // fallback neutro se CountAPI non risponde
+      setVisitCount(0);
     });
 }, []);            const speakNumber = (num) => {
                 if (!audioEnabled || isPlayingAudio) return;
