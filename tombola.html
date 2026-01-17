@@ -273,6 +273,8 @@
                         </button>
                         <button onClick={toggleFullscreen}
                             className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 md:py-4 px-4 md:px-6 rounded-xl shadow-lg transform transition hover:scale-105 text-base md:text-xl">📋 TABELLONE</button>
+                        
+                        <div id="shinystat-container" className="bg-yellow-400 text-red-700 font-bold py-2 md:py-3 px-3 md:px-4 rounded-xl shadow-lg border-2 md:border-4 border-yellow-600 flex items-center gap-2"></div>
                     </div>
 
                     {currentNumber && (
@@ -379,6 +381,18 @@
     </script>
 
     <!-- Inizio Codice ShinyStat -->
+    <script>
+        // Sposta il contatore ShinyStat nel container personalizzato
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                var shinystatLink = document.querySelector('a[href*="shinystat.com"]');
+                var container = document.getElementById('shinystat-container');
+                if (shinystatLink && container) {
+                    container.appendChild(shinystatLink);
+                }
+            }, 500);
+        });
+    </script>
     <script src="https://codice.shinystat.com/cgi-bin/getcod.cgi?USER=SS-54329799-c617b"></script>
     <noscript>
     <a href="https://www.shinystat.com/it/" target="_top">
