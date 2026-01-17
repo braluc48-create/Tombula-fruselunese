@@ -104,6 +104,7 @@
             const [audioEnabled, setAudioEnabled] = useState(true);
             const [isFullscreen, setIsFullscreen] = useState(false);
             const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+            const [visitCount, setVisitCount] = useState('...');
             const audioRef = useRef(null);
             const extractionInProgress = useRef(false);
 
@@ -127,6 +128,33 @@
                 81: "Sciampionné", 82: "Fignuitte", 83: "Cattacéca", 84: "Gl'Amute", 85: "Tittine",
                 86: "'Mbriachella", 87: "Gli Pelune", 88: "Madonna de la Cercia", 89: "La Stécena", 90: "La uermenara"
             };
+
+            React.useEffect(() => {
+                // Prova a leggere il contatore da ShinyStat
+                const checkCounter = () => {
+                    const shinystatImg = document.querySelector('a[href*="shinystat.com"] img');
+                    if (shinystatImg) {
+                        const alt = shinystatImg.alt || '';
+                        const title = shinystatImg.title || '';
+                        const match = (alt + title).match(/\d+/);
+                        
+                        if (match) {
+                            setVisitCount(parseInt(match[0]).toLocaleString('it-IT'));
+                            return;
+                        }
+                    }
+                    
+                    // Fallback: contatore locale
+                    let visits = parseInt(localStorage.getItem('local-visits') || '500');
+                    visits++;
+                    localStorage.setItem('local-visits', visits);
+                    setVisitCount(visits.toLocaleString('it-IT'));
+                };
+                
+                setTimeout(checkCounter, 2000);
+                const interval = setInterval(checkCounter, 5000);
+                return () => clearInterval(interval);
+            }, []);
 
             const speakNumber = (num) => {
                 if (!audioEnabled || isPlayingAudio) return;
@@ -281,7 +309,7 @@
                         
                         <div className="bg-yellow-400 text-red-700 font-bold py-2 md:py-3 px-3 md:px-4 rounded-xl shadow-lg border-2 md:border-4 border-yellow-600 flex items-center gap-2">
                             <span>🎲 Uote giucate:</span>
-                            <span id="visit-counter">...</span>
+                            <span>{visitCount}</span>
                         </div>
                     </div>
 
@@ -394,36 +422,5 @@
     <a href="https://www.shinystat.com/it/" target="_top">
     <img src="https://www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-54329799-c617b" alt="Statistiche web" style="border:0px" /></a>
     </noscript>
-    
-    <script>
-        // Estrae il numero di visite da ShinyStat e lo mostra nel contatore personalizzato
-        function updateVisitCounter() {
-            var shinystatImg = document.querySelector('a[href*="shinystat.com"] img');
-            var counter = document.getElementById('visit-counter');
-            
-            if (shinystatImg && counter) {
-                // Prova a estrarre il numero dall'attributo alt o title dell'immagine
-                var alt = shinystatImg.alt || '';
-                var title = shinystatImg.title || '';
-                var match = (alt + title).match(/\d+/);
-                
-                if (match) {
-                    counter.textContent = parseInt(match[0]).toLocaleString('it-IT');
-                } else {
-                    // Fallback: conta le visite in memoria
-                    var visits = parseInt(localStorage.getItem('local-visits') || '500');
-                    visits++;
-                    localStorage.setItem('local-visits', visits);
-                    counter.textContent = visits.toLocaleString('it-IT');
-                }
-            } else {
-                setTimeout(updateVisitCounter, 200);
-            }
-        }
-        
-        window.addEventListener('load', function() {
-            setTimeout(updateVisitCounter, 1000);
-        });
-    </script>
     <!-- Fine Codice ShinyStat -->
 </body>
