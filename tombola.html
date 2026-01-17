@@ -70,43 +70,10 @@
             right: 0;
             width: 5%;
         }
-        
-        .visit-counter {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #dc2626, #991b1b);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            font-weight: bold;
-            font-size: 16px;
-            z-index: 1001;
-            border: 3px solid #fbbf24;
-        }
     </style>
 </head>
 <body>
     <div id="root"></div>
-    
-    <!-- Contatore visite esterno con CountAPI -->
-    <div class="visit-counter">
-        🎲 Partite giocate: <span id="visits">...</span>
-    </div>
-
-    <script>
-        // Incrementa il contatore ad ogni caricamento della pagina
-        fetch('https://api.countapi.xyz/hit/tombola-frosinone/partite')
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('visits').textContent = data.value;
-            })
-            .catch(error => {
-                console.error('Errore contatore:', error);
-                document.getElementById('visits').textContent = '---';
-            });
-    </script>
 
     <script type="text/babel">
         const { useState, useRef } = React;
@@ -385,4 +352,22 @@
                                                                      textShadow: isExtracted ? '1px 1px 2px rgba(0,0,0,0.8)' : '1px 1px 1px rgba(255,255,255,0.8)'
                                                                  }}>
                                                                 {smorfiaFrusinate[num]}
-                                                            
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<TombolaGame />, document.getElementById('root'));
+    </script>
+</body>
+</html>
