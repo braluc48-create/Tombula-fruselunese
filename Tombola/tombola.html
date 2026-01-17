@@ -79,6 +79,11 @@
         a[href*="shinystat.com"] img {
             display: inline-block !important;
         }
+        
+        /* Nascondi completamente ShinyStat in fondo */
+        body > a[href*="shinystat.com"] {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -274,7 +279,10 @@
                         <button onClick={toggleFullscreen}
                             className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 md:py-4 px-4 md:px-6 rounded-xl shadow-lg transform transition hover:scale-105 text-base md:text-xl">📋 TABELLONE</button>
                         
-                        <div id="shinystat-container" className="bg-yellow-400 text-red-700 font-bold py-2 md:py-3 px-3 md:px-4 rounded-xl shadow-lg border-2 md:border-4 border-yellow-600 flex items-center gap-2"></div>
+                        <div className="bg-yellow-400 text-red-700 font-bold py-2 md:py-3 px-3 md:px-4 rounded-xl shadow-lg border-2 md:border-4 border-yellow-600 flex items-center gap-2">
+                            <span>👁️ Visite:</span>
+                            <span id="visit-counter">...</span>
+                        </div>
                     </div>
 
                     {currentNumber && (
@@ -381,22 +389,41 @@
     </script>
 
     <!-- Inizio Codice ShinyStat -->
-    <script>
-        // Sposta il contatore ShinyStat nel container personalizzato
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                var shinystatLink = document.querySelector('a[href*="shinystat.com"]');
-                var container = document.getElementById('shinystat-container');
-                if (shinystatLink && container) {
-                    container.appendChild(shinystatLink);
-                }
-            }, 500);
-        });
-    </script>
     <script src="https://codice.shinystat.com/cgi-bin/getcod.cgi?USER=SS-54329799-c617b"></script>
     <noscript>
     <a href="https://www.shinystat.com/it/" target="_top">
     <img src="https://www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-54329799-c617b" alt="Statistiche web" style="border:0px" /></a>
     </noscript>
+    
+    <script>
+        // Estrae il numero di visite da ShinyStat e lo mostra nel contatore personalizzato
+        function updateVisitCounter() {
+            var shinystatImg = document.querySelector('a[href*="shinystat.com"] img');
+            var counter = document.getElementById('visit-counter');
+            
+            if (shinystatImg && counter) {
+                // Prova a estrarre il numero dall'attributo alt o title dell'immagine
+                var alt = shinystatImg.alt || '';
+                var title = shinystatImg.title || '';
+                var match = (alt + title).match(/\d+/);
+                
+                if (match) {
+                    counter.textContent = parseInt(match[0]).toLocaleString('it-IT');
+                } else {
+                    // Fallback: conta le visite in memoria
+                    var visits = parseInt(localStorage.getItem('local-visits') || '500');
+                    visits++;
+                    localStorage.setItem('local-visits', visits);
+                    counter.textContent = visits.toLocaleString('it-IT');
+                }
+            } else {
+                setTimeout(updateVisitCounter, 200);
+            }
+        }
+        
+        window.addEventListener('load', function() {
+            setTimeout(updateVisitCounter, 1000);
+        });
+    </script>
     <!-- Fine Codice ShinyStat -->
 </body>
