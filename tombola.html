@@ -72,13 +72,6 @@
         }
     </style>
 </head>
-    <!-- Inizio Codice ShinyStat -->
-<script src="//codice.shinystat.com/cgi-bin/getcod.cgi?USER=SS-54329799-c617b"></script>
-<noscript>
-<a href="https://www.shinystat.com/it/" target="_top">
-<img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-54329799-c617b" alt="Statistiche web" style="border:0px" /></a>
-</noscript>
-<!-- Fine Codice ShinyStat -->
 <body>
     <div id="root"></div>
 
@@ -97,7 +90,6 @@
             const [audioEnabled, setAudioEnabled] = useState(true);
             const [isFullscreen, setIsFullscreen] = useState(false);
             const [isPlayingAudio, setIsPlayingAudio] = useState(false);
-            const [visitCount, setVisitCount] = useState(500);
             const audioRef = useRef(null);
             const extractionInProgress = useRef(false);
 
@@ -121,10 +113,6 @@
                 81: "Sciampionné", 82: "Fignuitte", 83: "Cattacéca", 84: "Gl'Amute", 85: "Tittine",
                 86: "'Mbriachella", 87: "Gli Pelune", 88: "Madonna de la Cercia", 89: "La Stécena", 90: "La uermenara"
             };
-
-            React.useEffect(() => {
-                setVisitCount(500 + Math.floor(Math.random() * 100));
-            }, []);
 
             const speakNumber = (num) => {
                 if (!audioEnabled || isPlayingAudio) return;
@@ -276,10 +264,6 @@
                         </button>
                         <button onClick={toggleFullscreen}
                             className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 md:py-4 px-4 md:px-6 rounded-xl shadow-lg transform transition hover:scale-105 text-base md:text-xl">📋 TABELLONE</button>
-                        
-                        <div className="bg-yellow-400 text-red-700 font-bold py-3 md:py-4 px-4 md:px-6 rounded-xl shadow-lg text-base md:text-xl border-2 md:border-4 border-yellow-600">
-                            👁️ Accessi: {visitCount.toLocaleString('it-IT')}
-                        </div>
                     </div>
 
                     {currentNumber && (
@@ -314,7 +298,7 @@
                             <div className="fixed top-4 left-0 right-0 z-50 flex justify-between px-4">
                                 <button onClick={extractNumber} disabled={extractedNumbers.length === 90 || isAnimating || isPlayingAudio}
                                     className="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg">🎲 Caccia 'ne nummere</button>
-                                <button onClick={toggleFullscreen} className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg">✕ Chiudi</button>
+                                <button onClick={toggleFullscreen} className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg">❌ Chiudi</button>
                             </div>
                         )}
                         <div className={`${isFullscreen ? 'p-8 pt-24' : 'max-w-7xl mx-auto mb-8'}`}>
@@ -384,5 +368,12 @@
 
         ReactDOM.render(<TombolaGame />, document.getElementById('root'));
     </script>
+
+    <!-- Inizio Codice ShinyStat -->
+    <script src="//codice.shinystat.com/cgi-bin/getcod.cgi?USER=SS-54329799-c617b"></script>
+    <noscript>
+    <a href="https://www.shinystat.com/it/" target="_top">
+    <img src="//www.shinystat.com/cgi-bin/shinystat.cgi?USER=SS-54329799-c617b" alt="Statistiche web" style="border:0px" /></a>
+    </noscript>
+    <!-- Fine Codice ShinyStat -->
 </body>
-</html>
